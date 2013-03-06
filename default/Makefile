@@ -37,7 +37,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Objects that must be built in order to link
-OBJECTS = main.o timer1.o timer0.o uart.o 
+OBJECTS = main.o timer1.o timer0.o uart.o keyboard_scan.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -56,6 +56,9 @@ timer0.o: ../timer0.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 uart.o: ../uart.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+keyboard_scan.o: ../keyboard_scan.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link

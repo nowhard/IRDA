@@ -2,6 +2,7 @@
 #include<avr/interrupt.h>
 #include "timer1.h"
 #include "timer0.h"
+#include "keyboard_scan.h"
 
 #include <ctype.h>
 #include <stdint.h>
@@ -24,12 +25,16 @@ volatile struct pt pt1, pt2,pt_key,pt_blink;
 extern unsigned int period;
 extern unsigned char address;
 extern unsigned char key_code;
+//unsigned char key_code_temp=0;
 
 void Port_Init(void);
 
 
 FILE uart_str = FDEV_SETUP_STREAM(&uart_putchar, &uart_getchar, _FDEV_SETUP_RW);
 PT_THREAD(Display_Out_Process(struct pt *pt));
+
+
+
 extern unsigned int capture;
 extern unsigned int first,second,third;
 //-----------------------------------------------
@@ -60,12 +65,13 @@ sei();
 		}
 	}*/
 	PT_INIT(&pt1);
-   // PT_INIT(&pt2);
+    PT_INIT(&pt2);
 //	PT_INIT(&pt_key);
 //	PT_INIT(&pt_blink);
 	while(1)
 	{
 		Display_Out_Process(&pt1);
+	//	Keyboard_Scan_Process(&pt2);
 	//	wdt_reset();
 	}
 }
@@ -77,10 +83,14 @@ void Port_Init(void)
 	DDRD|=0x10;
 	PORTD|=0x14;
 
-	DDRC=0xF;
-	PORTC=0x0;
+	DDRC=0x0;
+	PORTC=0xF;//вход, подтяжка +5
+	PCMSK1=0xF;//разрешаем прерывание по изменеию уровня на портах PC0-PC3
+	PCICR|=(1<<PCIE1);
+	
+	DDRB=0x1E;//PB1-PB4-выходы
+	PORTB|=0x1E;	
 
-	PORTB=0x0;
 	PORTB |= _BV(PB0);
 }
 //-----------------------------------------------
@@ -107,10 +117,16 @@ PT_THREAD(Display_Out_Process(struct pt *pt))
 
    while(1) 
    {
-	 PT_DELAY(pt,1000);
-	 printf("address= %u, key code= %u",address,key_code);
+	 PT_DELAY(pt,/*1000*/50);
+	 if(key_code!=0xFF)
+	 {
+	 	PT_DELAY(pt,50);
+		PORTB|=0x1E;
+	 }
+	 //printf("address= %u, key code= %u",address,key_code);
 	 //printf("first=%u,second=%u,third=%u",first,second,third);	
    }
    PT_END(pt);
  }
 //-----------------------------------------------------------------------------
+
