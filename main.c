@@ -43,7 +43,7 @@ int main(void)
 stdin = &uart_str;
 stdout = &uart_str;
 
-//poutoutput = USART0; 
+
 
 Timer0_Init();
 Port_Init();
@@ -66,11 +66,11 @@ sei();
 	}*/
 	PT_INIT(&pt1);
     PT_INIT(&pt2);
-//	PT_INIT(&pt_key);
-//	PT_INIT(&pt_blink);
+
 	while(1)
 	{
-		Display_Out_Process(&pt1);
+		//Display_Out_Process(&pt1);
+		Delay_Key_Process(&pt2);
 	//	Keyboard_Scan_Process(&pt2);
 	//	wdt_reset();
 	}
@@ -85,8 +85,8 @@ void Port_Init(void)
 
 	DDRC=0x0;
 	PORTC=0xF;//вход, подтяжка +5
-	PCMSK1=0xF;//разрешаем прерывание по изменеию уровня на портах PC0-PC3
-	PCICR|=(1<<PCIE1);
+	PCMSK1=0x0;//разрешаем прерывание по изменеию уровня на портах PC0-PC3
+	//PCICR|=(1<<PCIE1);
 	
 	DDRB=0x1E;//PB1-PB4-выходы
 	PORTB|=0x1E;	
@@ -117,13 +117,9 @@ PT_THREAD(Display_Out_Process(struct pt *pt))
 
    while(1) 
    {
-	 PT_DELAY(pt,/*1000*/50);
-	 if(key_code!=0xFF)
-	 {
-	 	PT_DELAY(pt,50);
-		PORTB|=0x1E;
-	 }
-	 //printf("address= %u, key code= %u",address,key_code);
+	 PT_DELAY(pt,1000);
+
+	 printf("address= %u, key code= %u",address,key_code);
 	 //printf("first=%u,second=%u,third=%u",first,second,third);	
    }
    PT_END(pt);

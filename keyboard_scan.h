@@ -27,5 +27,6 @@
 //----------------------------------------
 
 PT_THREAD(Keyboard_Scan_Process(struct pt *pt));
+PT_THREAD(Delay_Key_Process(struct pt *pt));
 
 #endif
